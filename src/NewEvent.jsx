@@ -6,6 +6,7 @@ function NewEvent() {
     const [email,setEmail] = useState("")
     const [event,setEvent] = useState("")
     const [students,setStudents] = useState([])
+    const [editingIndex, setEditingIndex] = useState(null); // track student being edited
       const handleSubmit = (e) => {
         e.preventDefault();
         if (name === ""  || email === ""   || event ==="" ){
@@ -14,7 +15,16 @@ function NewEvent() {
             return;
         }
         const newStudent = { name , email , event };
+        if (editingIndex !== null) {
+      // Update existing student
+      const updatedStudents = [...students];
+      updatedStudents[editingIndex] = newStudent;
+      setStudents(updatedStudents);
+      setEditingIndex(null); // Exit edit mode
+    } else {
+      // Add new student
         setStudents ([...students , newStudent]);
+    }
         // clear form
         setName("");
         setEmail("")
@@ -25,7 +35,24 @@ function NewEvent() {
             const updatedList = students.filter((_, i) =>
                 i !== index);
             setStudents(updatedList);
+
+            // Cancel edit mode if deleting the student being edited
+    if (index === editingIndex) {
+      setEditingIndex(null);
+      setName("");
+      setEmail("");
+      setEvent("");
+    }
         };
+
+        const editStudent = (index) => {
+    // Load student data into form
+    const student = students[index];
+    setName(student.name);
+    setEmail(student.email);
+    setEvent(student.event);
+    setEditingIndex(index); // Enter edit mode
+  };
 
         
         
@@ -46,7 +73,27 @@ function NewEvent() {
             <option>Seminar</option>
             <option>Cultural Fest</option>
             </select>
-            <button type="submit">Register</button>
+            <button type="submit">{editingIndex !== null ? "Update" : "Register"}</button>
+            {editingIndex !== null && (
+          <button
+            type="button"
+            onClick={() => {
+              // Cancel edit mode
+              setEditingIndex(null);
+              setName("");
+              setEmail("");
+              setEvent("");
+            }}
+            style={{ 
+              marginLeft: "10px",
+              background: "gray"
+            }}
+          >
+            Cancel
+          </button>
+        )}
+            
+            
             </form>
 
             <h3>Registered Students</h3>
@@ -70,15 +117,43 @@ function NewEvent() {
                                     <td>{s.name}</td>
                                     <td>{s.email}</td>
                                     <td>{s.event}</td>
-                                    <td><button className="delete-btn" onClick={() =>
-                                        deleteStudent(index)}>delete</button></td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                    </table>
-        </div>
-
+                                    <td><button
+                    className="edit-btn"
+                    onClick={() => editStudent(index)}
+                    style={{
+                      background: "green",
+                      color: "white",
+                      border: "none",
+                      padding: "5px 10px",
+                      marginRight: "5px",
+                      cursor: "pointer"
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="delete-btn"
+                    onClick={() => deleteStudent(index)}
+                    style={{
+                      background: "red",
+                      color: "white",
+                      border: "none",
+                      padding: "5px 10px",
+                      cursor: "pointer"
+                    }}
+                  >
+                    Delete
+                  </button>
+                  </td>
+                  </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
     )
 }
 export default NewEvent
+           
+         
+                                   
