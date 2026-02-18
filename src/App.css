@@ -59,6 +59,11 @@ th {
   color: white;
 }
 
+.edit-btn {
+  background: green ;
+}
+
+
 .delete-btn {
   background: red;
 }
